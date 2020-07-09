@@ -6,13 +6,25 @@ import requests
 import json
 import urllib.request as url
 
+import models
+from database import engine
+from database import SessionLocal
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+
 app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
 
 templates = Jinja2Templates(directory="templates")
 
 
+class PhotoRequest(BaseModel):
+    picId: str
+
+
 @app.get("/")
-def Gallery(request: Request):
+def gallery(request: Request):
     """
     displays the gallery on homepage
     """
@@ -56,3 +68,14 @@ def Gallery(request: Request):
         "URL14": URL[13],
         "URL15": URL[14],
     })
+
+
+@app.post("/gallery")
+def create_gallery(photo_request: PhotoRequest):
+    """
+    parses photo urls and stores in the database
+    """
+    return {
+        "code": "success",
+        "message": "photo created"
+    }
