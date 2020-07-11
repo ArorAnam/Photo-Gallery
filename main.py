@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 import requests
 import json
@@ -12,13 +12,19 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/")
-def Gallery(request: Request):
+def Gallery(request: Request, search_name: str = None):
     """
     displays the gallery on homepage
     """
-    response = requests.get(
-        "https://api.unsplash.com/search/photos?query=ireland&page=1&per_page=20&client_id"
-        "=2ec7WhtR7mQIuxbRBKTqv5HC9sk1RfcnKKWirbOockU")
+    if search_name:
+        place = search_name
+    else:
+        place = 'ireland'
+
+    query = "https://api.unsplash.com/search/photos?query=" + place + "&page=1&per_page=20&client_id" \
+                                                                            "=2ec7WhtR7mQIuxbRBKTqv5HC9sk1RfcnKKWirbOockU"
+
+    response = requests.get(query)
 
     data = response.json()
 
@@ -56,3 +62,8 @@ def Gallery(request: Request):
         "URL14": URL[13],
         "URL15": URL[14],
     })
+
+
+# @app.post("/")
+# async def getPlace(search_name: str = Form(...)):
+#     return {"search_name": search_name}
